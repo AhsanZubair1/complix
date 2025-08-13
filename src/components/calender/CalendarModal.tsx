@@ -187,30 +187,34 @@ export const CalendarModal = ({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
-          {selectedEvent && (
+        <div className="flex justify-between items-center mt-6 modal-footer">
+          <div>
+            {selectedEvent && (
+              <button
+                onClick={onDelete}
+                type="button"
+                className="btn btn-danger flex justify-center rounded-lg bg-[#0000FF] px-4 py-2.5 text-sm font-medium text-white hover:bg-red-600"
+              >
+                Delete Event
+              </button>
+            )}
+          </div>
+          <div className="flex gap-3">
             <button
-              onClick={onDelete}
+              onClick={onClose}
               type="button"
-              className="btn btn-danger flex w-full justify-center rounded-lg bg-red-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-600 sm:w-auto"
+              className="flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
             >
-              Delete Event
+              Close
             </button>
-          )}
-          <button
-            onClick={onClose}
-            type="button"
-            className="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto"
-          >
-            Close
-          </button>
-          <button
-            onClick={onSubmit}
-            type="button"
-            className="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
-          >
-            {selectedEvent ? "Update Changes" : "Add Event"}
-          </button>
+            <button
+              onClick={onSubmit}
+              type="button"
+              className="btn btn-success btn-update-event flex justify-center rounded-lg bg-[#0000FF] px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600"
+            >
+              {selectedEvent ? "Edit" : "Add Event"}
+            </button>
+          </div>
         </div>
       </div>
     </Modal>
