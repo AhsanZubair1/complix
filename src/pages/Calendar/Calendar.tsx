@@ -1,11 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import useSWR from "swr";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
-import { Modal } from "../../components/ui/modal";
 import { useModal } from "../../hooks/useModal";
 import PageMeta from "../../components/common/PageMeta";
 import {
@@ -78,15 +77,7 @@ const Calendar: React.FC = () => {
     })
   );
 
-  const calendarsEvents = {
-    Danger: "danger",
-    Success: "success",
-    Primary: "primary",
-    Warning: "warning",
-  };
-
-  // Transform API events to FullCalendar format
-  const events =
+   const events =
     apiEvents?.results.map((event) => {
       const isWeekDayView =
         currentView === "timeGridWeek" || currentView === "timeGridDay";
@@ -134,7 +125,7 @@ const Calendar: React.FC = () => {
     openModal();
   };
 
-  const handleViewChange = (viewInfo: any) => {
+  const handleViewChange = (viewInfo) => {
     setCurrentView(viewInfo.view.type);
   };
 
