@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import EditObligationModal from "./modals/eidtObligation";
 import ViewObligationModal from "./modals/viewObligation";
 
-
-// Mock data based on the image
+// Mock data (unchanged)
 const mockObligationsData = [
   {
     id: "RB1476",
@@ -19,7 +18,7 @@ const mockObligationsData = [
     reference: "Clause 100(2)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
   {
     id: "RB1477",
@@ -35,7 +34,7 @@ const mockObligationsData = [
     reference: "Clause 101(1)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
   {
     id: "RB1478",
@@ -51,7 +50,7 @@ const mockObligationsData = [
     reference: "Clause 102(3)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
   {
     id: "RB1479",
@@ -67,7 +66,7 @@ const mockObligationsData = [
     reference: "Clause 103(2)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
   {
     id: "RB1480",
@@ -83,7 +82,7 @@ const mockObligationsData = [
     reference: "Clause 104(1)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
   {
     id: "RB1481",
@@ -99,7 +98,7 @@ const mockObligationsData = [
     reference: "Clause 105(2)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
   {
     id: "RB1482",
@@ -115,7 +114,7 @@ const mockObligationsData = [
     reference: "Clause 106(3)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
   {
     id: "RB1483",
@@ -131,7 +130,7 @@ const mockObligationsData = [
     reference: "Clause 107(1)",
     personReviewed: "-",
     locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice"
+    digital: "Energy Retail Code of Practice",
   },
 ];
 
@@ -177,7 +176,6 @@ export default function ObligationsTable({
     setSelectedObligation(null);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -236,11 +234,10 @@ export default function ObligationsTable({
 
   return (
     <div className={className}>
-      {/* Table Container with rounded corners */}
+      {/* Table Container */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Table with fixed height and scrolling */}
         <div className="overflow-hidden">
-          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+          <div className="overflow-x-auto max-h-[650px] overflow-y-auto">
             <table className="min-w-full">
               <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
                 <tr>
@@ -391,85 +388,83 @@ export default function ObligationsTable({
             </table>
           </div>
         </div>
+      </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="flex items-center">
-            <button
-              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      {/* Pagination Footer */}
+      <div className="flex items-center justify-between px-6 py-4 mt-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center">
+          <button
+            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Previous
-            </button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Previous
+          </button>
+        </div>
 
-          <div className="flex items-center space-x-2">
-            {renderPageNumbers().map((page, index) => (
-              <button
-                key={index}
-                onClick={() =>
-                  typeof page === "number" && handlePageChange(page)
-                }
-                disabled={page === "..."}
-                className={`px-3 py-2 text-sm font-medium border rounded-lg transition-colors ${
-                  page === currentPage
-                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                    : page === "..."
-                    ? "text-gray-400 cursor-default border-transparent"
-                    : "text-gray-500 bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center">
+        <div className="flex items-center space-x-2">
+          {renderPageNumbers().map((page, index) => (
             <button
-              onClick={() =>
-                handlePageChange(Math.min(totalPages, currentPage + 1))
-              }
-              disabled={currentPage === totalPages}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              key={index}
+              onClick={() => typeof page === "number" && handlePageChange(page)}
+              disabled={page === "..."}
+              className={`px-3 py-2 text-sm font-medium border rounded-lg transition-colors ${
+                page === currentPage
+                  ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                  : page === "..."
+                  ? "text-gray-400 cursor-default border-transparent"
+                  : "text-gray-500 bg-white border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
+              }`}
             >
-              Next
-              <svg
-                className="w-4 h-4 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              {page}
             </button>
-          </div>
+          ))}
+        </div>
+
+        <div className="flex items-center">
+          <button
+            onClick={() =>
+              handlePageChange(Math.min(totalPages, currentPage + 1))
+            }
+            disabled={currentPage === totalPages}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+            <svg
+              className="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
         </div>
       </div>
 
       {/* Modal References */}
       <EditObligationModal isOpen={isEditOpen} onClose={closeEditModal} />
-      <ViewObligationModal 
-        isOpen={isViewOpen} 
-        onClose={closeViewModal} 
+      <ViewObligationModal
+        isOpen={isViewOpen}
+        onClose={closeViewModal}
         obligationData={selectedObligation}
       />
     </div>
