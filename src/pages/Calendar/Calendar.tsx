@@ -13,10 +13,16 @@ import {
   updateCalendarEvent,
   deleteCalendarEvent,
 } from "../../api/CalenderApi";
-import { CalendarModal } from "../../components/calender/CalendarModal";
+import { CalendarAddAndEditModal } from "../../components/calender/modals/AddAndEditModal";
+import { CalendarViewModal } from "../../components/calender/modals/ViewModal";
 
 interface CalendarEvent extends EventInput {
-  extendedProps: {
+  id?: string;
+  title?: string;
+  start?: Date;
+  end?: Date;
+  created?: string;
+  extendedProps?: {
     calendar: string;
   };
   allDay?: boolean;
@@ -62,7 +68,19 @@ const Calendar: React.FC = () => {
   });
   const [currentView, setCurrentView] = useState("dayGridMonth");
   const calendarRef = useRef<FullCalendar>(null);
-  const { isOpen, openModal, closeModal } = useModal();
+
+  // Separate modal controls for view and edit
+  const {
+    isOpen: isViewModalOpen,
+    openModal: openViewModal,
+    closeModal: closeViewModal,
+  } = useModal();
+
+  const {
+    isOpen: isEditModalOpen,
+    openModal: openEditModal,
+    closeModal: closeEditModal,
+  } = useModal();
 
   // Use SWR to fetch calendar events
   const {
@@ -77,7 +95,7 @@ const Calendar: React.FC = () => {
     })
   );
 
-   const events =
+  const events =
     apiEvents?.results.map((event) => {
       const isWeekDayView =
         currentView === "timeGridWeek" || currentView === "timeGridDay";
@@ -87,7 +105,7 @@ const Calendar: React.FC = () => {
         start: utcToLocalDatetime(event.start_date),
         end: utcToLocalDatetime(event.due_date),
         extendedProps: { calendar: event.color || "Primary" },
-        allDay: isWeekDayView, // Force allDay for week/day views
+        allDay: isWeekDayView,
       };
     }) || [];
 
@@ -106,26 +124,34 @@ const Calendar: React.FC = () => {
 
     setEventStartDate(startDate.toISOString());
     setEventEndDate(endDate.toISOString());
-    openModal();
+    openEditModal();
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const event = clickInfo.event;
-    setSelectedEvent({
+    const eventData = {
       id: event.id,
       title: event.title,
       start: event.start ?? undefined,
       end: event.end ?? undefined,
       extendedProps: event.extendedProps,
-    });
+      created: event.start ? event.start.toLocaleString() : "",
+    };
+
+    setSelectedEvent(eventData);
     setEventTitle(event.title);
     setEventStartDate(event.start?.toISOString() || "");
     setEventEndDate(event.end?.toISOString() || "");
     setEventLevel(event.extendedProps.calendar);
-    openModal();
+    openViewModal();
   };
 
-  const handleViewChange = (viewInfo) => {
+  const handleEditClick = () => {
+    closeViewModal();
+    openEditModal();
+  };
+
+  const handleViewChange = (viewInfo: { view: { type: string } }) => {
     setCurrentView(viewInfo.view.type);
   };
 
@@ -173,7 +199,7 @@ const Calendar: React.FC = () => {
         await createCalendarEvent(payload);
       }
       mutate();
-      closeModal();
+      closeEditModal();
       resetModalFields();
     } catch (error) {
       console.error("Failed to save event:", error);
@@ -185,7 +211,7 @@ const Calendar: React.FC = () => {
       try {
         await deleteCalendarEvent(parseInt(selectedEvent.id));
         mutate();
-        closeModal();
+        closeEditModal();
         resetModalFields();
       } catch (error) {
         console.error("Failed to delete event:", error);
@@ -287,14 +313,25 @@ const Calendar: React.FC = () => {
             customButtons={{
               addEventButton: {
                 text: "Add Event +",
-                click: openModal,
+                click: openEditModal,
               },
             }}
           />
         </div>
-        <CalendarModal
-          isOpen={isOpen}
-          onClose={closeModal}
+
+        {/* View Modal */}
+        <CalendarViewModal
+          isOpen={isViewModalOpen}
+          onClose={closeViewModal}
+          currentView={currentView}
+          selectedEvent={selectedEvent}
+          onEditClick={handleEditClick}
+        />
+
+        {/* Edit Modal */}
+        <CalendarAddAndEditModal
+          isOpen={isEditModalOpen}
+          onClose={closeEditModal}
           currentView={currentView}
           selectedEvent={selectedEvent}
           eventTitle={eventTitle}
@@ -314,7 +351,7 @@ const Calendar: React.FC = () => {
   );
 };
 
-const renderEventContent = (eventInfo) => {
+const renderEventContent = (eventInfo: any) => {
   const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`;
 
   // For week and day views, show only in all-day section

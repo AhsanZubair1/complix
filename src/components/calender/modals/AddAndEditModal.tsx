@@ -1,4 +1,4 @@
-import { Modal } from "../../components/ui/modal";
+import { Modal } from "../../ui/modal";
 
 interface CalendarEvent {
   id?: string;
@@ -51,7 +51,7 @@ const formatDateForLocalInput = (dateString: string) => {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
-export const CalendarModal = ({
+export const CalendarAddAndEditModal = ({
   isOpen,
   onClose,
   currentView,
