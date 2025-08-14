@@ -3,6 +3,11 @@ import { Modal } from "../../ui/modal";
 import Label from "../../form/Label";
 import Input from "../../form/input/InputField";
 import TextArea from "../../form/input/TextArea";
+import {
+  createObligation,
+  ObligationsResponse,
+} from "../../../api/obligation/ObligationApi";
+import { mutate } from "swr";
 
 interface AddObligationModalProps {
   isOpen: boolean;
@@ -35,6 +40,52 @@ interface FormErrors {
   personReviewed?: string;
 }
 
+function mapFormDataToApiPayload(formatDate: FormData): ObligationPayload {
+  return {
+    code: "OBG-2023-001",
+    title: "Monthly Compliance Report",
+    instrument: 1, // Example: 1 = Digital
+    type: 1, // Example: 1 = Regulatory
+    status: 1, // Example: 1 = Pending
+    start_date: new Date().toISOString(),
+    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+    frequency_of_meeting: 2, // Example: 2 = Monthly
+    reference_where_applicable: "Section 4.2 of Policy",
+    reference: [
+      { url: "https://example.com/policy", title: "Policy Document" },
+    ],
+    description: "Monthly report required by regulatory body X",
+    evidence: [{ url: "https://example.com/evidence1.pdf", type: "pdf" }],
+    location_of_evidence: "Shared Drive > Compliance > Reports",
+    responsible_for_review: "John Doe (johndoe@example.com)",
+    how_to_review: "Verify all metrics and sign off",
+    is_sign_off: false,
+    policies_and_procedures: "See compliance handbook chapter 3",
+    owner: 1, // Actual user ID from your system
+    follower: [1], // Array of actual user IDs
+    last_review_date: new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000
+    ).toISOString(),
+  };
+}
+
+const handleCreateObligation = async (formData: FormData) => {
+  try {
+    const payload = mapFormDataToApiPayload(formData);
+
+    // 1. Make the API call first
+    await createObligation(payload);
+
+    // 2. Trigger revalidation of all matching SWR keys
+    await mutate((key) => Array.isArray(key) && key[0] === "obligations");
+
+    // Alternative: Revalidate just the current query
+    // await mutate(['obligations', queryParams]);
+  } catch (error) {
+    console.error("Failed to create obligation:", error);
+    throw error;
+  }
+};
 export default function AddObligationModal({
   isOpen,
   onClose,
@@ -65,10 +116,10 @@ export default function AddObligationModal({
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
 
     if (errors[name as keyof FormErrors]) {
@@ -81,16 +132,23 @@ export default function AddObligationModal({
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    
-    if (!formData.reference.trim()) newErrors.reference = "Reference is required";
-    if (!formData.instrument.trim()) newErrors.instrument = "Instrument is required";
+
+    if (!formData.reference.trim())
+      newErrors.reference = "Reference is required";
+    if (!formData.instrument.trim())
+      newErrors.instrument = "Instrument is required";
     if (!formData.type) newErrors.type = "Type is required";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (!formData.description.trim())
+      newErrors.description = "Description is required";
     if (!formData.evidence.trim()) newErrors.evidence = "Evidence is required";
-    if (!formData.locationOfEvidence.trim()) newErrors.locationOfEvidence = "Location of evidence is required";
-    if (!formData.obligationFollower.trim()) newErrors.obligationFollower = "Obligation follower is required";
-    if (!formData.obligationOwner.trim()) newErrors.obligationOwner = "Obligation owner is required";
-    if (!formData.personReviewed.trim()) newErrors.personReviewed = "Person reviewed is required";
+    if (!formData.locationOfEvidence.trim())
+      newErrors.locationOfEvidence = "Location of evidence is required";
+    if (!formData.obligationFollower.trim())
+      newErrors.obligationFollower = "Obligation follower is required";
+    if (!formData.obligationOwner.trim())
+      newErrors.obligationOwner = "Obligation owner is required";
+    if (!formData.personReviewed.trim())
+      newErrors.personReviewed = "Person reviewed is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -106,11 +164,13 @@ export default function AddObligationModal({
       // Replace this with your actual API call
       // const payload = mapFormDataToApiPayload(formData);
       // await createObligation(payload);
-      
+      // mutate("obligation");
+      handleCreateObligation(formData);
+
       console.log("Creating obligation with data:", formData);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       onClose();
       if (onObligationCreated) onObligationCreated();
@@ -137,7 +197,6 @@ export default function AddObligationModal({
 
       <form className="flex flex-col" onSubmit={handleSubmit}>
         <div className="custom-scrollbar h-[450px] overflow-y-auto px-2">
-          
           {/* Reference Field */}
           <div className="sm:col-span-2">
             <Label>
@@ -291,7 +350,9 @@ export default function AddObligationModal({
               className={errors.locationOfEvidence ? "border-red-500" : ""}
             />
             {errors.locationOfEvidence && (
-              <p className="mt-1 text-sm text-red-500">{errors.locationOfEvidence}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.locationOfEvidence}
+              </p>
             )}
           </div>
 
@@ -310,7 +371,9 @@ export default function AddObligationModal({
               className={errors.obligationFollower ? "border-red-500" : ""}
             />
             {errors.obligationFollower && (
-              <p className="mt-1 text-sm text-red-500">{errors.obligationFollower}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.obligationFollower}
+              </p>
             )}
           </div>
 
@@ -329,7 +392,9 @@ export default function AddObligationModal({
               className={errors.obligationOwner ? "border-red-500" : ""}
             />
             {errors.obligationOwner && (
-              <p className="mt-1 text-sm text-red-500">{errors.obligationOwner}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.obligationOwner}
+              </p>
             )}
           </div>
 
@@ -348,7 +413,9 @@ export default function AddObligationModal({
               className={errors.personReviewed ? "border-red-500" : ""}
             />
             {errors.personReviewed && (
-              <p className="mt-1 text-sm text-red-500">{errors.personReviewed}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.personReviewed}
+              </p>
             )}
           </div>
 

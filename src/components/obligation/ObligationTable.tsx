@@ -1,159 +1,83 @@
 import { useState, useEffect, useRef } from "react";
 import EditObligationModal from "./modals/eidtObligation";
 import ViewObligationModal from "./modals/viewObligation";
+import {
+  Obligation,
+  ObligationQueryParams,
+  ObligationsResponse,
+  getObligationInstrumentDisplay,
+  getObligationTypeDisplay,
+  getObligations,
+} from "../../api/obligation/ObligationApi";
+import useSWR from "swr";
 
 // Mock data (unchanged)
-const mockObligationsData = [
-  {
-    id: "RB1476",
-    obligationNumber: "RB1476",
-    instrument: "Energy Retail Code Of...",
-    description: "Retailer notice of end...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 100(2)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-  {
-    id: "RB1477",
-    obligationNumber: "RB1477",
-    instrument: "Energy Retail Code Of...",
-    description: "Liabilities and immuni...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 101(1)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-  {
-    id: "RB1478",
-    obligationNumber: "RB1478",
-    instrument: "Energy Retail Code Of...",
-    description: "Indemnities...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 102(3)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-  {
-    id: "RB1479",
-    obligationNumber: "RB1479",
-    instrument: "Energy Retail Code Of...",
-    description: "Notice of price or ban...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 103(2)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-  {
-    id: "RB1480",
-    obligationNumber: "RB1480",
-    instrument: "Energy Retail Code Of...",
-    description: "Requirement for feed...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 104(1)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-  {
-    id: "RB1481",
-    obligationNumber: "RB1481",
-    instrument: "Energy Retail Code Of...",
-    description: "Requirement for feed...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 105(2)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-  {
-    id: "RB1482",
-    obligationNumber: "RB1482",
-    instrument: "Energy Retail Code Of...",
-    description: "Identification of...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 106(3)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-  {
-    id: "RB1483",
-    obligationNumber: "RB1483",
-    instrument: "Energy Retail Code Of...",
-    description: "Identifying the demo...",
-    type: "Type 2",
-    obligationOwner: "FAHAD LIAQAT",
-    obligationFailover: "STEVE PAPRAS",
-    lastReviewDate: "-",
-    isSignedOff: "No",
-    evidence: "-",
-    reference: "Clause 107(1)",
-    personReviewed: "-",
-    locationOfEvidence: "-",
-    digital: "Energy Retail Code of Practice",
-  },
-];
+interface TableObligation {
+  id: string;
+  obligationNumber: string;
+  instrument: string;
+  description: string;
+  type: string;
+  obligationOwner: string;
+  obligationFailover: string;
+  lastReviewDate: string;
+  isSignedOff: string;
+  evidence: string;
+  reference: string;
+  personReviewed: string;
+  locationOfEvidence: string;
+  digital: string;
+  rawObligation: Obligation; // Store the raw Obligation for modals
+}
 
 interface ObligationsTableProps {
   className?: string;
+  searchParams: ObligationQueryParams;
 }
+
+// Create a SWR fetcher using your apiClient
+const swrFetcher = async (params: ObligationQueryParams) => {
+  return await getObligations(params);
+};
 
 export default function ObligationsTable({
   className = "",
+  searchParams,
 }: ObligationsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
-  const [selectedObligation, setSelectedObligation] = useState<any>(null);
+  const [selectedObligation, setSelectedObligation] =
+    useState<Obligation | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const itemsPerPage = 8;
-  const totalPages = Math.ceil(mockObligationsData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = mockObligationsData.slice(startIndex, endIndex);
 
+  // Prepare query parameters for SWR
+  const queryParams: ObligationQueryParams = {
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage,
+    ...(searchParams.search_key && { search_key: searchParams.search_key }),
+    ...(searchParams.instrument && { instrument: searchParams.instrument }),
+    ...(searchParams.type && { type: searchParams.type }),
+    ...(searchParams.status && { status: searchParams.status }),
+    ...(searchParams.owner_ids && { owner_ids: searchParams.owner_ids }),
+    ...(searchParams.follower_ids && {
+      follower_ids: searchParams.follower_ids,
+    }),
+    ...(searchParams.breach_ids && { breach_ids: searchParams.breach_ids }),
+  };
+
+  // Use SWR with your apiClient-based fetcher
+  const { data, mutate } = useSWR(
+    ["obligations", queryParams], // Include queryParams in the key
+    () => getObligations(queryParams),
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 2000,
+    }
+  );
   const handleEdit = (obligation: any) => {
     setSelectedObligation(obligation);
     setIsEditOpen(true);
@@ -196,8 +120,10 @@ export default function ObligationsTable({
     setCurrentPage(page);
   };
 
+  const totalPages = data ? Math.ceil(data.count / itemsPerPage) : 1;
+
   const renderPageNumbers = () => {
-    const pages = [];
+    const pages: (number | string)[] = [];
     const maxVisiblePages = 7;
 
     if (totalPages <= maxVisiblePages) {
@@ -231,6 +157,26 @@ export default function ObligationsTable({
 
     return pages;
   };
+
+  // Map API data to table format
+  const currentData: TableObligation[] =
+    data?.results.map((obligation) => ({
+      id: obligation.id.toString(),
+      obligationNumber: `RB${obligation.id}`,
+      instrument: getObligationInstrumentDisplay(obligation.instrument),
+      description: obligation.title || "-",
+      type: getObligationTypeDisplay(obligation.type),
+      obligationOwner: obligation.owner.username || "Unknown",
+      obligationFailover: obligation.follower[0]?.username || "-",
+      lastReviewDate: obligation.modified.split("T")[0] || "-",
+      isSignedOff: obligation.status === 3 ? "Yes" : "No", // COMPLETED = 3
+      evidence: "-",
+      reference: "-", // Placeholder
+      personReviewed: "-", // Placeholder
+      locationOfEvidence: "-", // Placeholder
+      digital: getObligationInstrumentDisplay(obligation.instrument),
+      rawObligation: obligation,
+    })) || [];
 
   return (
     <div className={className}>
@@ -270,10 +216,10 @@ export default function ObligationsTable({
                     key={obligation.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                       {obligation.obligationNumber}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                    <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                       <span
                         className="cursor-pointer hover:scale-105 transition-transform inline-block"
                         onClick={() => handleView(obligation)}
@@ -281,21 +227,21 @@ export default function ObligationsTable({
                         {obligation.instrument}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 max-w-xs truncate">
+                    <td className="px-2 py-4 text-sm text-gray-600 dark:text-gray-300 max-w-xs truncate">
                       {obligation.description}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                         {obligation.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                    <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                       {obligation.obligationOwner}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                    <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                       {obligation.lastReviewDate}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 relative">
+                    <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 relative">
                       <div className="flex items-center justify-center">
                         <div
                           className="relative inline-block"
@@ -330,7 +276,8 @@ export default function ObligationsTable({
                               openDropdownId === obligation.id
                                 ? "block"
                                 : "hidden"
-                            } absolute right-0 z-20 mt-1 w-32 origin-top-right rounded-lg bg-white dark:bg-gray-800 shadow-lg`}
+                            } absolute right-20 z-20 mt-1 w-32 origin-top-right rounded-lg  bg-white dark:bg-gray-800 shadow-lg ring-1 ring-white ring-opacity-5`}
+                            style={{ position: "fixed" }} // Add this line
                           >
                             <div className="py-1">
                               <button

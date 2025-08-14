@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const HARDCODED_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1MTAxODgyLCJpYXQiOjE3NTUwNjU5NDIsImp0aSI6IjMwNzEyYjVhODZhODRhYzBhYjIzMmY3ZGI0ZTU3Zjc5IiwidXNlcl9pZCI6MX0.WGzI-5tDHMBQmyXdkryKX4_D9GkhNrledNZ8xPYTlT8";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1MTM4OTUzLCJpYXQiOjE3NTUxMDMwMTMsImp0aSI6IjkzNTM4OWIwOTZkYTRhZDZhNjcwYzc2YmY3NThiMTZhIiwidXNlcl9pZCI6MX0.bT-RzOV_vJPW0T5udCWYJpK55wVKJRcvMjHh4S8cx8I";
 const apiClient = axios.create({
   baseURL: "http://127.0.0.1:8000/api/v1.0",
   headers: {

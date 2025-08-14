@@ -186,12 +186,16 @@ export default function AddTaskModal({
       const payload = mapFormDataToApiPayload(formData);
       if (isEditing && task?.id) {
         await updateTask(task.id, payload);
-        await mutate("/task_service/task/");
+        await mutate(
+          (key) => Array.isArray(key) && key[0] === "/task_service/task/"
+        );
         onClose();
         if (onTaskUpdated) onTaskUpdated();
       } else {
         await createTask(payload);
-        await mutate("/task_service/task/");
+        await mutate(
+          (key) => Array.isArray(key) && key[0] === "/task_service/task/"
+        );
         onClose();
         if (onTaskCreated) onTaskCreated();
       }

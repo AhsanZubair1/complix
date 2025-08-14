@@ -1,10 +1,17 @@
 import { useModal } from "../../hooks/useModal";
-import AddTaskModal from "../task/modals/addTask";
 import Button from "../ui/button/Button";
 import AddObligationModal from "./modals/addObligationRecord";
+import { ObligationQueryParams } from "../../api/obligation/ObligationApi";
+interface ObligationHeaderProps {
+  onSearch: (params: ObligationQueryParams) => void;
+}
 
-export default function ObligationHeader(){
+export default function ObligationHeader({ onSearch }: ObligationHeaderProps) {
   const { isOpen, openModal, closeModal } = useModal();
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearch({ search_key: e.target.value });
+  };
 
   return (
     <>
@@ -17,6 +24,7 @@ export default function ObligationHeader(){
                 type="text"
                 placeholder="Search..."
                 className="w-full h-[44px] pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={handleSearchChange}
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -63,7 +71,7 @@ export default function ObligationHeader(){
         </div>
       </div>
 
-      {/* seperator */}
+      {/* Separator */}
       <div className="h-[1px] w-full bg-gray-200 mb-2" />
 
       <AddObligationModal isOpen={isOpen} onClose={closeModal} />
