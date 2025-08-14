@@ -27,7 +27,7 @@ export const fetchBreaches = async (
 
 export const fetchBreach = async (id: string): Promise<Breach> => {
   const response: AxiosResponse<Breach> = await apiClient.get(
-    `/breach_service/breach/${id}/`
+    `/breach_service/breach/${id}`
   );
   return response.data;
 };
@@ -47,14 +47,14 @@ export const updateBreach = async (
   payload: Partial<Breach>
 ): Promise<Breach> => {
   const response: AxiosResponse<Breach> = await apiClient.patch(
-    `/breach_service/breach/${id}/`,
+    `/breach_service/breach/${id}`,
     payload
   );
   return response.data;
 };
 
 export const deleteBreach = async (id: string): Promise<void> => {
-  await apiClient.delete(`/breach_service/breaches/${id}/`);
+  await apiClient.delete(`/breach_service/breaches/${id}`);
 };
 
 export const fetchBreachTypes = async (): Promise<BreachType[]> => {

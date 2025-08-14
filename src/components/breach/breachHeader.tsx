@@ -1,9 +1,7 @@
 import Button from "../ui/button/Button";
-import AddBreachModal from "./modals/addBreach";
 import { useModal } from "../../hooks/useModal";
 import { useState, useEffect } from "react";
-import { createBreach } from "../../api/Breach/BreachApi";
-import { Breach } from "../../api/Breach/BreachType.type";
+import AddOrEditBreachModal from "./modals/addOrEditBreach";
 
 interface BreachHeaderProps {
   onSearch: (searchTerm: string) => void;
@@ -20,79 +18,22 @@ const BreachHeader = ({ onSearch }: BreachHeaderProps) => {
     return () => clearTimeout(timer);
   }, [searchTerm, onSearch]);
 
-  const handleAddBreach = async (formData: Partial<Breach>) => {
-    try {
-      await createBreach(formData);
-      closeModal();
-      // Optionally refresh the parent component's data here
-    } catch (error) {
-      console.error("Failed to add breach:", error);
-    }
-  };
-
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "16px 24px 16px 24px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-            gap: "20px",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              gap: "12px",
-              width: "100%",
-              justifyContent: "flex-end",
-            }}
-          >
-            <div
-              style={{
-                position: "relative",
-                flex: 1,
-                maxHeight: "44px",
-                minHeight: "44px",
-              }}
-            >
+      <div className="flex flex-col items-center px-4 py-5 xl:px-6 xl:py-6">
+        <div className="flex flex-col w-full gap-5 sm:justify-between xl:flex-row xl:items-center">
+          <div className="flex flex-wrap items-center gap-3 w-full xl:justify-end">
+            {/* Search field occupying remaining width */}
+            <div className="relative flex-1 max-h-[44px] min-h-[44px]">
               <input
                 type="text"
                 placeholder="Search..."
-                style={{
-                  width: "100%",
-                  height: "44px",
-                  padding: "10px 40px 10px 16px",
-                  borderRadius: "8px",
-                  border: "1px solid #d1d5db",
-                  outline: "none",
-                  fontSize: "14px",
-                }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-[44px] pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <svg
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  height: "20px",
-                  width: "20px",
-                  color: "#9ca3af",
-                }}
+                className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -107,53 +48,39 @@ const BreachHeader = ({ onSearch }: BreachHeaderProps) => {
               </svg>
             </div>
 
-            <div style={{ maxHeight: "44px", minHeight: "44px" }}>
+            {/* Button with fixed dimensions */}
+            <div className="max-h-[44px] min-h-[44px]">
               <Button
                 size="sm"
                 onClick={openModal}
-                style={{
-                  width: "148px",
-                  height: "44px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="w-[148px] h-[44px]"
               >
+                Add Breach
                 <svg
-                  style={{ width: "20px", height: "20px", marginRight: "8px" }}
+                  className="fill-current"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
                   fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M9.2502 4.99951C9.2502 4.5853 9.58599 4.24951 10.0002 4.24951C10.4144 4.24951 10.7502 4.5853 10.7502 4.99951V9.24971H15.0006C15.4148 9.24971 15.7506 9.5855 15.7506 9.99971C15.7506 10.4139 15.4148 10.7497 15.0006 10.7497H10.7502V15.0001C10.7502 15.4143 10.4144 15.7501 10.0002 15.7501C9.58599 15.7501 9.2502 15.4143 9.2502 15.0001V10.7497H5C4.58579 10.7497 4.25 10.4139 4.25 9.99971C4.25 9.5855 4.58579 9.24971 5 9.24971H9.2502V4.99951Z"
+                    fill=""
                   />
                 </svg>
-                Add Breach
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          height: "1px",
-          width: "100%",
-          backgroundColor: "#e5e7eb",
-          marginBottom: "8px",
-        }}
-      />
+      {/* separator */}
+      <div className="h-[1px] w-full bg-gray-200 mb-2" />
 
-      <AddBreachModal
-        isOpen={isOpen}
-        onClose={closeModal}
-        onAddBreach={handleAddBreach}
-      />
+      <AddOrEditBreachModal isOpen={isOpen} onClose={closeModal} />
     </>
   );
 };

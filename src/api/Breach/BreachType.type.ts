@@ -5,7 +5,7 @@ export interface Breach {
   type: number;
   category: number;
   start_date: string;
-  due_date: string; // match backend naming
+  due_date: string;
   nature: string;
   cause: string;
   identification_date: string;
@@ -23,25 +23,26 @@ export interface Breach {
   wdp_amount: number;
   wdp_applied_date?: string;
   additional_considerations: string;
-  created_by?: {
-    username: string;
-  };
-  assigned_to: {
-    username: string;
-  };
+  assigned_to: number;
   obligation?: number;
   created_at?: string;
   updated_at?: string;
 }
 
-export interface BreachType {
-  id: number;
-  name: string;
+export enum BreachType {
+  RT1_LIC_ERE = 1,
+  RT5_LIC_GRE = 2,
 }
 
-export interface BreachCategory {
-  id: number;
-  name: string;
+export enum BreachCategory {
+  DAILY = 1,
+  WEEKLY = 2,
+  MONTHLY = 3,
+  QUARTERLY = 4,
+  ANNUAL = 5,
+  SCHEDULED = 6,
+  WHEN_REQUIRED = 7,
+  IF_REQUIRED = 8,
 }
 
 export interface BreachParams {

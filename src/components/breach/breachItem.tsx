@@ -1,9 +1,9 @@
 import React from "react";
 import { useModal } from "../../hooks/useModal";
-import EditBreachModal from "./modals/editBreach";
+import EditBreachModal from "./modals/addOrEditBreach";
 import ViewBreachModal from "./modals/viewBreach";
-import AddBreachModal from "./modals/addBreach";
 import { Breach } from "../../api/Breach/BreachType.type";
+import AddOrEditBreachModal from "./modals/addOrEditBreach";
 
 interface BreachDataListProps {
   items: Breach[];
@@ -60,22 +60,24 @@ const BreachDataList: React.FC<BreachDataListProps> = ({
             <div className="grid grid-cols-3 gap-4 w-[70%]">
               {/* Column 1 */}
               <div className="space-y-2">
-                <div className="text-md text-gray-600">{item.id}</div>
+                <div className="text-md text-gray-600">{item.title}</div>
                 <div className="text-md text-gray-600">
                   {formatDate(item.start_date)}
                 </div>
-                <div className="text-md text-gray-600">{item.title}</div>
-                <div className="text-md text-gray-600">${item.wdp_amount}</div>
+                <div className="text-md text-gray-600">
+                  {formatDate(item.due_date)}
+                </div>
+                <div className="text-md text-gray-600">{item.wdp_amount}</div>
               </div>
 
               {/* Column 2 */}
               <div className="space-y-2">
-                <div className="text-md text-gray-600">{item.id}</div>
+                <div className="text-md text-gray-600">{item.title}</div>
                 <div className="text-md text-gray-600">
                   {formatDate(item.identification_date)}
                 </div>
                 <div className="text-md text-gray-600">
-                  {formatDate(item.due_date)}
+                  {formatDate(item?.wdp_applied_date ?? "N/A")}
                 </div>
               </div>
 
@@ -90,7 +92,7 @@ const BreachDataList: React.FC<BreachDataListProps> = ({
                   </span>
                 </div>
                 <div className="text-md text-gray-600 px-2">
-                  {item.category ? "Active" : "Inactive"}
+                  {item.potential_customer_impact}
                 </div>
               </div>
             </div>
@@ -117,16 +119,15 @@ const BreachDataList: React.FC<BreachDataListProps> = ({
       {/* Modals */}
       {selectedBreach && (
         <>
-          <EditBreachModal
+          <AddOrEditBreachModal
             isOpen={isEditOpen}
             onClose={closeEditModal}
             breach={selectedBreach}
-            onRefresh={onRefresh}
           />
           <ViewBreachModal
             isOpen={isViewOpen}
             onClose={closeViewModal}
-            breach={selectedBreach}
+            breachId={selectedBreach.id}
           />
         </>
       )}
